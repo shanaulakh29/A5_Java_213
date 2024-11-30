@@ -1,17 +1,5 @@
 package org.example.Modal;
 
-import org.example.Modal.CourseLocation.CampusLocation;
-import org.example.Modal.CourseLocation.Location;
-import org.example.Modal.CourseOfferingsDetails.CourseOfferingDetails;
-import org.example.Modal.CourseOfferingsDetails.OfferringDetails;
-import org.example.Modal.InstructorDetails.Instructor;
-import org.example.Modal.InstructorDetails.InstructorName;
-import org.example.Modal.Semester.Semester;
-import org.example.Modal.Semester.SemesterName;
-import org.example.Modal.Subject.Subject;
-import org.example.Modal.Subject.SubjectDetails;
-
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;

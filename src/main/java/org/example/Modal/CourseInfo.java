@@ -1,7 +1,5 @@
 package org.example.Modal;
 
-import org.example.Modal.Section.SectionDetail;
-
 import java.util.ArrayList;
 import java.util.List;
 
