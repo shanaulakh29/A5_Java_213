@@ -2,12 +2,11 @@ package org.example.Modal;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ExtractDataFromFile {
-    public List<CourseDetail> courses = new ArrayList<>();
-    CourseGroup courseGroup = new CourseGroup();
+    private List<Course> courses = new ArrayList<>();
+    private List<Department> departments = new ArrayList<>();
 
     public void extractDataFromFile() {
         try {
@@ -16,30 +15,12 @@ public class ExtractDataFromFile {
             String line;
             bufferedReader.readLine();
             while ((line = bufferedReader.readLine()) != null) {
-                List<String> data = new ArrayList<>();
-                boolean quotationFound = false;
-                StringBuilder currentValue = new StringBuilder();
-                for (int i = 0; i < line.length(); i++) {
-                    char c = line.charAt(i);
-                    if (c == '\"') {
-                        quotationFound = !quotationFound;
-                    } else if ((c == ',' && !quotationFound)) {
-                        data.add(currentValue.toString().trim());
-                        currentValue = new StringBuilder();
-                    } else if (i == line.length() - 1) {
-                        currentValue.append(c);
-                        data.add(currentValue.toString().trim());
-                        currentValue = new StringBuilder();
-
-                    } else {
-                        currentValue.append(c);
-                    }
-                }
+                List<String> data = parseCSV(line);
 
                 for (int i = 0; i < data.size(); i++) {
                     System.out.println(data.get(i));
                 }
-                Semester semester = new SemesterName(data.get(0));
+                Semester semester = new Semester(data.get(0));
                 SubjectDetails subjectDetails = new Subject(data.get(1), data.get(2));
                 CampusLocation campusLocation = new Location(data.get(3));
                 List<String> instructorNames = Arrays.stream((data.get(6).split(","))).toList();
@@ -67,6 +48,31 @@ public class ExtractDataFromFile {
             throw new RuntimeException(e);
         }
     }
+
+    private static List<String> parseCSV(String line) {
+        List<String> data = new ArrayList<>();
+        boolean quotationFound = false;
+        StringBuilder currentValue = new StringBuilder();
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == '\"') {
+                quotationFound = !quotationFound;
+            } else if ((c == ',' && !quotationFound)) {
+                data.add(currentValue.toString().trim());
+                currentValue = new StringBuilder();
+            } else if (i == line.length() - 1) {
+                currentValue.append(c);
+                data.add(currentValue.toString().trim());
+                currentValue = new StringBuilder();
+
+            } else {
+                currentValue.append(c);
+            }
+        }
+        return data;
+    }
+
+
 //public static void main(String[] args) {
 //        ExtractDataFromFile extractDataFromFile=new ExtractDataFromFile();
 //        extractDataFromFile.extractDataFromFile();

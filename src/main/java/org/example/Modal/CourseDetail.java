@@ -1,22 +1,22 @@
-package org.example.Modal;
-
-public class CourseDetail {
-    Semester semester;
-    SubjectDetails subjectDetails;
-    Instructor instructor;
-    CampusLocation campusLocation;
-    OfferringDetails offerringDetails;
-    CourseDetail(Semester semester, SubjectDetails subjectDetails, Instructor instructor, CampusLocation campusLocation, OfferringDetails offerringDetails) {
-        this.semester = semester;
-        this.subjectDetails = subjectDetails;
-        this.instructor = instructor;
-        this.campusLocation = campusLocation;
-        this.offerringDetails = offerringDetails;
-    }
-
-
-
-}
+//package org.example.Modal;
+//
+//public class CourseDetail {
+//    Semester semester;
+//    SubjectDetails subjectDetails;
+//    Instructor instructor;
+//    CampusLocation campusLocation;
+//    OfferringDetails offerringDetails;
+//    CourseDetail(Semester semester, SubjectDetails subjectDetails, Instructor instructor, CampusLocation campusLocation, OfferringDetails offerringDetails) {
+//        this.semester = semester;
+//        this.subjectDetails = subjectDetails;
+//        this.instructor = instructor;
+//        this.campusLocation = campusLocation;
+//        this.offerringDetails = offerringDetails;
+//    }
+//
+//
+//
+//}
 //    public  boolean isSameCourseLab(CourseDetail courseDetail) {
 //        if(isSameCourseListing(courseDetail)){
 //            if(this.offerringDetails.getComponentCode().equals(courseDetail.offerringDetails.getComponentCode())){

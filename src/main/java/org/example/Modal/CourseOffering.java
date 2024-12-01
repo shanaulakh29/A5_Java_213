@@ -38,7 +38,7 @@ public class CourseOffering {
         return location;
     }
 
-    public String getInstructor() {
+    public String getInstructors() {
         String instructorToReturn = instructors.get(0);
         for (String instructor : instructors.subList(1, instructors.size())) {
             instructorToReturn += ", " + instructor ;
