@@ -17,4 +17,11 @@ public class Semester {
     }
 
 
+    public int getYear() {
+        return year;
+    }
+
+    public String getTerm() {
+        return term;
+    }
 }

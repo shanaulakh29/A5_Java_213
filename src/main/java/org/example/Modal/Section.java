@@ -1,7 +1,7 @@
 package org.example.Modal;
 
 public class Section {
-    private String componentCode;
+    private final String componentCode;
     private int enrolmentCapacity;
     private int enrolmentTotal;
 
@@ -15,4 +15,17 @@ public class Section {
         this.enrolmentTotal += toBeEnrolled;
         this.enrolmentCapacity += extraCapacity;
     }
+
+    public String getComponentCode() {
+        return componentCode;
+    }
+
+    public int getEnrolmentCapacity() {
+        return enrolmentCapacity;
+    }
+
+    public int getEnrolmentTotal() {
+        return enrolmentTotal;
+    }
+
 }
