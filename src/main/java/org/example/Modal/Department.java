@@ -1,28 +1,29 @@
-package org.example.Modal;
+//package org.example.Modal;
+//
+//import java.util.*;
+//
+//public class Department {
+////    private final String subject;
+//    private final List<List<Course>> departments = new ArrayList<>();
+//
+//    public List<List<Course>> getDepartments() {
+//        return departments;
+//    }
+//
+//
+//}
 
-import java.util.*;
+//    public Department(String subject) {
+//        this.subject = subject;
+//    }
 
-public class Department {
-    private final String subject;
-    private final List<Course> courses = new ArrayList<>();
+//    public void addCourse(Course course) {
+//       for (List<Course> courses : departments) {
+//
+//       }
+//        }
+//    }
 
-    public Department(String subject) {
-        this.subject = subject;
-    }
-
-    public void addCourse(Course course) {
-        if (!courses.contains(course)) {
-            courses.add(course);
-        }
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public List<Course> getCourses() {
-        return courses;
-    }
-
-
-}
+//    public String getSubject() {
+//        return subject;
+//    }

@@ -1,6 +1,6 @@
 package org.example.Modal;
 
-public class Section {
+public class Section implements Comparable<Section>{
     private final String componentCode;
     private int enrolmentCapacity;
     private int enrolmentTotal;
@@ -11,9 +11,9 @@ public class Section {
         this.enrolmentTotal = enrolmentTotal;
     }
 
-    public void addEnrolment(int toBeEnrolled, int extraCapacity) {
-        this.enrolmentTotal += toBeEnrolled;
+    public void addEnrolment(int extraCapacity,int extraEnrollment) {
         this.enrolmentCapacity += extraCapacity;
+        this.enrolmentTotal += extraEnrollment;
     }
 
     public String getComponentCode() {
@@ -27,5 +27,8 @@ public class Section {
     public int getEnrolmentTotal() {
         return enrolmentTotal;
     }
-
+    @Override
+    public int compareTo(Section other) {
+        return this.getComponentCode().compareTo(other.getComponentCode());
+    }
 }

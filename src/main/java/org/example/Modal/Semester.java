@@ -8,7 +8,9 @@ public class Semester {
     public Semester(String semesterCode) {
         this.semesterCode = semesterCode;
         int semesterNum = Integer.parseInt(semesterCode);
-        this.year = semesterNum / 10;
+        int yearToBeCalculated= semesterNum / 10;
+        this.year= calculateYear(yearToBeCalculated);
+
         int termNum = semesterNum % 10;
 
         switch (termNum) {
@@ -16,6 +18,14 @@ public class Semester {
             case 4 -> this.term = "Summer";
             case 7 -> this.term = "Fall";
         }
+    }
+    public int calculateYear(int yearToBeCalculated) {
+        int z=yearToBeCalculated%10;
+        yearToBeCalculated=yearToBeCalculated/10;
+        int y=yearToBeCalculated%10;
+        yearToBeCalculated=yearToBeCalculated/10;
+        int x=yearToBeCalculated%10;
+        return 1900+100*x+10*y+z;
     }
 
     public String getSemesterCode() {
@@ -28,5 +38,11 @@ public class Semester {
 
     public String getTerm() {
         return this.term;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        Semester semester = (Semester) o;
+        return this.semesterCode.equals(semester.semesterCode);
     }
 }
