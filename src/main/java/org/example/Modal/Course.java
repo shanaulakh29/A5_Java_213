@@ -12,8 +12,6 @@ public class Course {
     private List<String> instructors = new ArrayList<>();
     private List<Section> sections = new ArrayList<>();
     private Section section;
-    private static List<Course> ListOfGroupedCoursesBasedOnSimilarProfessors = new ArrayList<>();
-    private static List<List<Course>> ListOfGroupedCoursesBasedOnSubject = new ArrayList<>();
 
 
     public Course(Semester semester, String subjectName, String subjectCatalogNumber,
