@@ -1,5 +1,7 @@
 package org.example.Modal;
 
+import org.example.DTO.ApiOfferingDataDTO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,7 @@ public class Facade {
     public void addCourseToListOfGroupedCoursesBelongingToSameSubject(Course course) {
         List<List<Course>> listOfGroupedCoursesBasedOnSubject = getListOfGroupedCoursesBasedOnSubject();
 
-        boolean isSubjectFound = false;)
+        boolean isSubjectFound = false;
         for (List<Course> courses : listOfGroupedCoursesBasedOnSubject) {
             if (courses.get(0).isSameSubject(course)) {
                 courses.add(course);
@@ -36,6 +38,18 @@ public class Facade {
             listOfGroupedCoursesBasedOnSubject.add(newListOfGroupedCoursesBasedOnSubject);
 
         }
+    }
+
+    public void addNewOffering(ApiOfferingDataDTO dto) {
+        List<String> instructors = dto.instructor != null
+                ? List.of(dto.instructor.split(","))
+                : new ArrayList<>();
+
+        Semester semester = new Semester(dto.semester);
+        Section section = new Section(dto.component, dto.enrollmentCap, dto.enrollmentTotal);
+        Course course = new Course(semester, dto.subjectName, dto.catalogNumber, dto.location, instructors, section);
+
+        addCourseToListOfGroupedCoursesBelongingToSameSubject(course);
     }
 
 }

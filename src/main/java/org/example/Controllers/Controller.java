@@ -185,22 +185,13 @@ public class Controller {
     @PostMapping("api/addoffering")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> addOffering(@RequestBody ApiOfferingDataDTO dto) {
-        String semesterCode = dto.semester;
-        String subjectName = dto.subjectName;
-        String subjectCatalogNumber = dto.catalogNumber;
-        String campusLocation = dto.location;
-        int enrolmentCap = dto.enrollmentCap;
-        String componentCode = dto.component;
-        int enrolmentTotal = dto.enrollmentTotal;
-        List<String> instructors = Arrays.asList(dto.instructor.split(", "));
+        if (dto.semester == null || dto.subjectName == null || dto.catalogNumber == null) {
+            return new ResponseEntity<>("Invalid request. Missing required fields.", HttpStatus.BAD_REQUEST);
+        }
 
-        Semester semester = new Semester(semesterCode);
-        Section section = new Section(componentCode, enrolmentCap, enrolmentTotal);
-        Course course = new Course(semester, subjectName, subjectCatalogNumber, campusLocation, instructors, section);
+        facade.addNewOffering(dto);
 
-        ExtractDataFromFile dataExtractor = new ExtractDataFromFile();
-
-        //return new ResponseEntity<>(, HttpStatus.CREATED);
+        return new ResponseEntity<>("New offering added successfully.", HttpStatus.CREATED);
     }
 
 
