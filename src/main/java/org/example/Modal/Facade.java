@@ -1,12 +1,15 @@
 package org.example.Modal;
 
+import org.example.DTO.ApiDepartmentDTO;
 import org.example.DTO.ApiOfferingDataDTO;
+import org.example.DTO.ApiWatcherDTO;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Facade {
     private ExtractDataFromFile extractDataFromFile = new ExtractDataFromFile();
+    private List<Watcher> watchers = new ArrayList<>();
 
     public void extractDataFromCSVFile() {
         extractDataFromFile.extractDataFromFile();
@@ -50,6 +53,17 @@ public class Facade {
         Course course = new Course(semester, dto.subjectName, dto.catalogNumber, dto.location, instructors, section);
 
         addCourseToListOfGroupedCoursesBelongingToSameSubject(course);
+    }
+
+    public List<Watcher> getWatchers() {
+        return watchers;
+    }
+
+    public void addWatcher(Watcher watcher) {
+        watchers.add(watcher);
+    }
+
+    public List<ApiWatcherDTO> getAllApiWatchers() {
     }
 
 }

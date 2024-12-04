@@ -197,8 +197,9 @@ public class Controller {
 
     @GetMapping("api/watchers")
     public List<ApiWatcherDTO> getWatchers() {
-        List<ApiWatcherDTO> watchers = new ArrayList<>();
+        List<ApiWatcherDTO> watcherDTOs = new ArrayList<>;
 
-        return watchers;
+
+
     }
 }
