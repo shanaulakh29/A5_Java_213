@@ -229,14 +229,20 @@ public class Controller {
 
     @PostMapping("api/addoffering")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> addOffering(@RequestBody ApiOfferingDataDTO dto) {
+    public ResponseEntity<ApiOfferingSectionDTO> addOffering(@RequestBody ApiOfferingDataDTO dto) {
         if (dto.semester == null || dto.subjectName == null || dto.catalogNumber == null) {
-            return new ResponseEntity<>("Invalid request. Missing required fields.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         facade.addNewOffering(dto);
 
-        return new ResponseEntity<>("New offering added successfully.", HttpStatus.CREATED);
+        ApiOfferingSectionDTO newSectionDTO = new ApiOfferingSectionDTO(
+                dto.component,
+                dto.enrollmentCap,
+                dto.enrollmentTotal
+        );
+
+        return new ResponseEntity<>(newSectionDTO, HttpStatus.CREATED);
     }
 
 
