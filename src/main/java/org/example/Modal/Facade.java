@@ -9,7 +9,27 @@ import java.util.List;
 
 public class Facade {
     private ExtractDataFromFile extractDataFromFile = new ExtractDataFromFile();
-    private List<Watcher> watchers = new ArrayList<>();
+    private List<CourseSectionChangeObserver> observers=new ArrayList<>();
+
+    //Observer Code
+
+
+
+    public void addObserver(CourseSectionChangeObserver observer){
+        observers.add(observer);
+    }
+    public void removeObserver(long id){
+        CourseSectionChangeObserver observerToRemove=null;
+        for(CourseSectionChangeObserver observer:observers){
+            if(observer.getId()==id){
+                observerToRemove=observer;
+            }
+        }
+        if(observerToRemove!=null){
+            observers.remove(observerToRemove);
+        }
+    }
+
 
     public void extractDataFromCSVFile() {
         extractDataFromFile.extractDataFromFile();
@@ -36,11 +56,16 @@ public class Facade {
         }
 
         if (!isSubjectFound) {
-            List<Course> newListOfGroupedCoursesBasedOnSubject = new ArrayList<>();
-            newListOfGroupedCoursesBasedOnSubject.add(course);
-            listOfGroupedCoursesBasedOnSubject.add(newListOfGroupedCoursesBasedOnSubject);
+            List<Course> courses= new ArrayList<>();
+            courses.add(course);
+            listOfGroupedCoursesBasedOnSubject.add(courses);
 
         }
+    }
+    private void notifyAllOberserversOfTheNewSectionBeingAdded(Course course){
+       for(CourseSectionChangeObserver observer: observers){
+           observer.newSectionBeingAdded(course);
+       }
     }
 
     public void addNewOffering(ApiOfferingDataDTO dto) {
@@ -53,17 +78,11 @@ public class Facade {
         Course course = new Course(semester, dto.subjectName, dto.catalogNumber, dto.location, instructors, section);
 
         addCourseToListOfGroupedCoursesBelongingToSameSubject(course);
+
+
+        notifyAllOberserversOfTheNewSectionBeingAdded(course);
     }
 
-    public List<Watcher> getWatchers() {
-        return watchers;
-    }
 
-    public void addWatcher(Watcher watcher) {
-        watchers.add(watcher);
-    }
-
-    public List<ApiWatcherDTO> getAllApiWatchers() {
-    }
 
 }

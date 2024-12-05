@@ -9,17 +9,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
 public class Controller {
-
+   private long WATCHER_ID_COUNTER = 1;
     Facade facade = new Facade();
     List<List<Course>> AllGroupedCoursesBelongingToSameSubject = facade.getListOfGroupedCoursesBasedOnSubject();
     List<ApiDepartmentDTO> departmentsDTO = new ArrayList<>();
     List<ApiCourseDTO> coursesDTO = new ArrayList<>();
     List<ApiCourseOfferingDTO> courseOfferingsDTO = new ArrayList<>();
     List<ApiOfferingSectionDTO> offeringSectionsDTO = new ArrayList<>();
+    List<ApiWatcherDTO> watchersDTO = new ArrayList<>();
+
+
 
     @GetMapping("/api/about")
     public ResponseEntity<ApiAboutDTO> getHelloMessage() {
@@ -32,6 +39,8 @@ public class Controller {
         facade.extractDataFromCSVFile();
         facade.printAllGroupedCoursesBelongingToSameSubject();
     }
+
+
 
     public boolean containsDepartment(List<ApiDepartmentDTO> departments, String departmentName) {
         for (ApiDepartmentDTO department : departments) {
@@ -162,7 +171,7 @@ public class Controller {
                                                 if (location.equals(course.getLocation()) && semesterCode == Long.parseLong(course.getSemester().getSemesterCode())
                                                         && year == course.getSemester().getYear() && instructors.equals(course.getInstructorsNamesForPrinting())) {
                                                     for (Section section : course.getSectionsList()) {
-                                                        ApiOfferingSectionDTO apiOfferingSectionDTO = new ApiOfferingSectionDTO(section.getComponentCode(), section.getEnrolmentCapacity(), section.getEnrolmentTotal());
+                                                        ApiOfferingSectionDTO apiOfferingSectionDTO = new ApiOfferingSectionDTO(section.getComponentCode(), section.getEnrolmentTotal(),section.getEnrolmentCapacity());
                                                         offeringSectionsDTO.add(apiOfferingSectionDTO);
                                                     }
 
@@ -196,10 +205,111 @@ public class Controller {
 
 
     @GetMapping("api/watchers")
-    public List<ApiWatcherDTO> getWatchers() {
-        List<ApiWatcherDTO> watcherDTOs = new ArrayList<>;
-
-
+    public ResponseEntity<List<ApiWatcherDTO>> getWatchers() {
+        System.out.println("Entered Get api/watchers");
+        return new ResponseEntity<>(watchersDTO, HttpStatus.OK);
 
     }
+    private String getDepartmentName(long deptId){
+        for(ApiDepartmentDTO apiDepartmentDTO : departmentsDTO){
+            if(apiDepartmentDTO.getDeptId() == deptId){
+                return apiDepartmentDTO.getName();
+            }
+        }
+        return null;
+    }
+    private boolean isSameDepartmentName(Course course, String departmentName) {
+        return course.getSubjectName().toUpperCase().equals(departmentName);
+    }
+    private String getCourseCatalogNumber(String departmentName,long courseId){
+        for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject){
+            if(isSameDepartmentName(courses.get(0), departmentName)){
+                for(ApiCourseDTO apiCourseDTO : coursesDTO){
+
+                    if(apiCourseDTO.courseId == courseId){
+                        return apiCourseDTO.catalogNumber;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    @PostMapping("/api/watchers")
+    public ResponseEntity<HttpStatus> createWatcher(@RequestBody ApiWatcherCreateDTO apiWatcherCreateDTO) {
+    long deptId= apiWatcherCreateDTO.deptId;
+    long courseId= apiWatcherCreateDTO.courseId;
+     String departmentName=getDepartmentName(deptId);
+     if(departmentName == null){
+         System.out.println("Department name is null");
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+     }
+     String courseCatalogNumber=getCourseCatalogNumber(departmentName,courseId);
+     if(courseCatalogNumber == null){
+         System.out.println("Course catalog number is null");
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+     }
+
+
+        ApiDepartmentDTO departmentDTO=new ApiDepartmentDTO(deptId, departmentName);
+     ApiCourseDTO courseDTO=new ApiCourseDTO(courseId, courseCatalogNumber);
+        List<String> events=new ArrayList<>();
+        ApiWatcherDTO apiWatcherDTO=new ApiWatcherDTO(WATCHER_ID_COUNTER,departmentDTO,courseDTO,events);
+        facade.addObserver(new CourseSectionChangeObserver() {
+            @Override
+            public long getId() {
+                return WATCHER_ID_COUNTER;
+            }
+
+            @Override
+            public void newSectionBeingAdded(Course course) {
+
+                String watcherCatalogNumber= apiWatcherDTO.course.catalogNumber;
+                String watcherDepartmentName=apiWatcherDTO.department.name;
+
+                if(watcherCatalogNumber.equals(course.getSubjectCatalogNumber())&& watcherDepartmentName.equals(course.getSubjectName())){
+                    ZonedDateTime zonedDateTime = ZonedDateTime.now();
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss z yyyy");
+                    String formattedDate = zonedDateTime.format(dateTimeFormatter);
+                    apiWatcherDTO.events.add(formattedDate+" Added section "+course.getSection().getComponentCode()+" with enrollment ("+course.getSection().getEnrolmentTotal()+"/"+course.getSection().getEnrolmentCapacity()+")"+
+                            " to offering "+course.getSemester().getTerm()+course.getSemester().getYear());
+
+                }
+            }
+
+
+        });
+        watchersDTO.add(apiWatcherDTO);
+        System.out.println("apiWatcherDTO length is"+watchersDTO.size());
+
+    return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/api/watchers/{id}")
+    public ResponseEntity<ApiWatcherDTO> getWatcher(@PathVariable long id) {
+        for(ApiWatcherDTO apiWatcherDTO : watchersDTO){
+            if(apiWatcherDTO.id == id){
+                return new ResponseEntity<>(apiWatcherDTO, HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping("/api/watchers/{id}")
+    public ResponseEntity<HttpStatus> deleteWatcher(@PathVariable long id) {
+
+        ApiWatcherDTO apiWatcherDTOToBeDeleted=null;
+        for(ApiWatcherDTO apiWatcherDTO : watchersDTO){
+            if(apiWatcherDTO.id == id){
+                apiWatcherDTOToBeDeleted=apiWatcherDTO;
+                break;
+            }
+        }
+        if(apiWatcherDTOToBeDeleted != null){
+            watchersDTO.remove(apiWatcherDTOToBeDeleted);
+            facade.removeObserver(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
 }

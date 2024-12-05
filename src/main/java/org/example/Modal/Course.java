@@ -12,7 +12,7 @@ public class Course {
     private List<String> instructors = new ArrayList<>();
     private List<Section> sections = new ArrayList<>();
     private Section section;
-
+//    private List<courseSectionChangeObserver> observers=new ArrayList<>();
 
     public Course(Semester semester, String subjectName, String subjectCatalogNumber,
                   String location, List<String> instructors, Section section) {
@@ -24,6 +24,15 @@ public class Course {
         this.section = section;
         this.addNewSectionOrAddIntoAlreadyExistingSection(this.section);
     }
+//    //Observer Code
+//    interface courseSectionChangeObserver{
+//        void newSectionBeingAdded();
+//    }
+//
+//    public void addObserver(courseSectionChangeObserver observer){
+//        observers.add(observer);
+//    }
+
 
     public Semester getSemester() {
         return semester;
