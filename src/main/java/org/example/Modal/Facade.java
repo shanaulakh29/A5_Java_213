@@ -1,31 +1,35 @@
 package org.example.Modal;
 
-import org.example.DTO.ApiDepartmentDTO;
-import org.example.DTO.ApiOfferingDataDTO;
-import org.example.DTO.ApiWatcherDTO;
+import org.example.DTO.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Facade {
     private ExtractDataFromFile extractDataFromFile = new ExtractDataFromFile();
-    private List<CourseSectionChangeObserver> observers=new ArrayList<>();
+    private List<CourseSectionChangeObserver> observers = new ArrayList<>();
+    private List<ApiCourseDTO> courseDTOs = new ArrayList<>();
+    private List<ApiDepartmentDTO> departmentDTOs = new ArrayList<>();
+    private List<ApiCourseOfferingDTO> courseOfferingDTOs = new ArrayList<>();
+    private long courseId;
+    private long departmentId;
+    private long courseOfferingId;
 
     //Observer Code
 
 
-
-    public void addObserver(CourseSectionChangeObserver observer){
+    public void addObserver(CourseSectionChangeObserver observer) {
         observers.add(observer);
     }
-    public void removeObserver(long id){
-        CourseSectionChangeObserver observerToRemove=null;
-        for(CourseSectionChangeObserver observer:observers){
-            if(observer.getId()==id){
-                observerToRemove=observer;
+
+    public void removeObserver(long id) {
+        CourseSectionChangeObserver observerToRemove = null;
+        for (CourseSectionChangeObserver observer : observers) {
+            if (observer.getId() == id) {
+                observerToRemove = observer;
             }
         }
-        if(observerToRemove!=null){
+        if (observerToRemove != null) {
             observers.remove(observerToRemove);
         }
     }
@@ -44,10 +48,8 @@ public class Facade {
     }
 
     public void addCourseToListOfGroupedCoursesBelongingToSameSubject(Course course) {
-        List<List<Course>> listOfGroupedCoursesBasedOnSubject = getListOfGroupedCoursesBasedOnSubject();
-
         boolean isSubjectFound = false;
-        for (List<Course> courses : listOfGroupedCoursesBasedOnSubject) {
+        for (List<Course> courses : getListOfGroupedCoursesBasedOnSubject()) {
             if (courses.get(0).isSameSubject(course)) {
                 courses.add(course);
                 isSubjectFound = true;
@@ -56,16 +58,17 @@ public class Facade {
         }
 
         if (!isSubjectFound) {
-            List<Course> courses= new ArrayList<>();
+            List<Course> courses = new ArrayList<>();
             courses.add(course);
-            listOfGroupedCoursesBasedOnSubject.add(courses);
+            getListOfGroupedCoursesBasedOnSubject().add(courses);
 
         }
     }
-    private void notifyAllOberserversOfTheNewSectionBeingAdded(Course course){
-       for(CourseSectionChangeObserver observer: observers){
-           observer.newSectionBeingAdded(course);
-       }
+
+    private void notifyAllOberserversOfTheNewSectionBeingAdded(Course course) {
+        for (CourseSectionChangeObserver observer : observers) {
+            observer.newSectionBeingAdded(course);
+        }
     }
 
     public void addNewOffering(ApiOfferingDataDTO dto) {
@@ -78,11 +81,7 @@ public class Facade {
         Course course = new Course(semester, dto.subjectName, dto.catalogNumber, dto.location, instructors, section);
 
         addCourseToListOfGroupedCoursesBelongingToSameSubject(course);
-
-
         notifyAllOberserversOfTheNewSectionBeingAdded(course);
     }
-
-
 
 }

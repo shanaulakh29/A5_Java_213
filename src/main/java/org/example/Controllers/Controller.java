@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -18,6 +16,8 @@ import java.util.*;
 @RestController
 public class Controller {
     private long WATCHER_ID_COUNTER = 1;
+    private long DEPARTMENT_ID_COUNTER = 1;
+    private long COURSE_ID_COUNTER = 1;
     Facade facade = new Facade();
     List<List<Course>> AllGroupedCoursesBelongingToSameSubject = facade.getListOfGroupedCoursesBasedOnSubject();
     List<ApiDepartmentDTO> departmentsDTO = new ArrayList<>();
@@ -52,19 +52,18 @@ public class Controller {
     @GetMapping("/api/departments")
     public ResponseEntity<List<ApiDepartmentDTO>> getDepartments() {
         System.out.println("Entered getDepartments");
-        int deptIdCounter = 1;
 
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             String departmentName = courses.get(0).getSubjectName().toUpperCase();
             if (departmentsDTO.isEmpty()) {
-                ApiDepartmentDTO apiDepartmentDTO = new ApiDepartmentDTO(deptIdCounter, departmentName);
+                ApiDepartmentDTO apiDepartmentDTO = new ApiDepartmentDTO(DEPARTMENT_ID_COUNTER, departmentName);
                 departmentsDTO.add(apiDepartmentDTO);
-                deptIdCounter++;
+                DEPARTMENT_ID_COUNTER++;
             } else {
                 if (!containsDepartment(departmentsDTO, departmentName)) {
-                    ApiDepartmentDTO apiDepartmentDTO = new ApiDepartmentDTO(deptIdCounter, departmentName);
+                    ApiDepartmentDTO apiDepartmentDTO = new ApiDepartmentDTO(DEPARTMENT_ID_COUNTER, departmentName);
                     departmentsDTO.add(apiDepartmentDTO);
-                    deptIdCounter++;
+                    DEPARTMENT_ID_COUNTER++;
                 }
             }
 
@@ -109,16 +108,20 @@ public class Controller {
     @GetMapping("/api/departments/{id}/courses")
     public ResponseEntity<List<ApiCourseDTO>> getCoursesFromSpecificDepartment(@PathVariable long id) {
         System.out.println("Department ID is :" + id);
-        long courseIdCounter = 1;
         String departmentName = getDepartmentName(id);
+
+        if (departmentName == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (Course course : courses) {
 
                     if (!containsCourse(coursesDTO, course.getSubjectCatalogNumber())) {
-                        ApiCourseDTO courseDTO = new ApiCourseDTO(courseIdCounter, course.getSubjectCatalogNumber());
+                        ApiCourseDTO courseDTO = new ApiCourseDTO(COURSE_ID_COUNTER, course.getSubjectCatalogNumber());
                         coursesDTO.add(courseDTO);
-                        courseIdCounter++;
+                        COURSE_ID_COUNTER++;
                     }
                 }
                 System.out.println("-----------------------------------------------------");
@@ -154,13 +157,16 @@ public class Controller {
         System.out.println("Department ID is :" + departmentId);
         System.out.println("Course ID is :" + courseId);
         String departmentName = getDepartmentName(departmentId);
+
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (ApiCourseDTO courseDTO : coursesDTO) {
                     addCourseOfferingsToCourseOfferingsDTOList(courseDTO, courseId, courses);
-
                 }
             }
+        }
+        if (courseOfferingsDTO.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>(courseOfferingsDTO, HttpStatus.OK);
@@ -222,6 +228,9 @@ public class Controller {
                 }
             }
         }
+        if (offeringSectionsDTO.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
 
         return new ResponseEntity<>(offeringSectionsDTO, HttpStatus.OK);
@@ -232,6 +241,29 @@ public class Controller {
     public ResponseEntity<ApiOfferingSectionDTO> addOffering(@RequestBody ApiOfferingDataDTO dto) {
         if (dto.semester == null || dto.subjectName == null || dto.catalogNumber == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        boolean isDepartmentAlreadyExist = false;
+        for (ApiDepartmentDTO departmentDTO : departmentsDTO) {
+            if (departmentDTO.name.equals(dto.subjectName)) {
+                isDepartmentAlreadyExist = true;
+                break;
+            }
+        }
+        if (!isDepartmentAlreadyExist) {
+            ApiDepartmentDTO newDepartmentDTO = new ApiDepartmentDTO(DEPARTMENT_ID_COUNTER, dto.subjectName);
+            departmentsDTO.add(newDepartmentDTO);
+            DEPARTMENT_ID_COUNTER++;
+        }
+        boolean isCourseAlreadyExist = false;
+        for (ApiCourseDTO courseDTO : coursesDTO) {
+            if (courseDTO.catalogNumber.equalsIgnoreCase(dto.catalogNumber)) {
+                isCourseAlreadyExist = true;
+            }
+        }
+        if (!isCourseAlreadyExist) {
+            ApiCourseDTO newCourseDTO = new ApiCourseDTO(COURSE_ID_COUNTER, dto.catalogNumber);
+            coursesDTO.add(newCourseDTO);
+            COURSE_ID_COUNTER++;
         }
 
         facade.addNewOffering(dto);
