@@ -113,7 +113,7 @@ public class Controller {
         if (departmentName == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
+        coursesDTO.clear();
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (Course course : courses) {
@@ -158,6 +158,7 @@ public class Controller {
         System.out.println("Course ID is :" + courseId);
         String departmentName = getDepartmentName(departmentId);
 
+        courseOfferingsDTO.clear();
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (ApiCourseDTO courseDTO : coursesDTO) {
@@ -219,6 +220,7 @@ public class Controller {
 
     ) {
 
+        offeringSectionsDTO.clear();
         String departmentName = getDepartmentName(departmentId);
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
