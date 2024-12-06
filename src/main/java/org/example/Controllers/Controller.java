@@ -107,13 +107,13 @@ public class Controller {
 
     @GetMapping("/api/departments/{id}/courses")
     public ResponseEntity<List<ApiCourseDTO>> getCoursesFromSpecificDepartment(@PathVariable long id) {
+//        coursesDTO.clear();
         System.out.println("Department ID is :" + id);
         String departmentName = getDepartmentName(id);
 
         if (departmentName == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        coursesDTO.clear();
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (Course course : courses) {
@@ -154,11 +154,11 @@ public class Controller {
     @GetMapping("/api/departments/{departmentId}/courses/{courseId}/offerings")
     ResponseEntity<List<ApiCourseOfferingDTO>> getCourseOfferingsOfParticularCourse(@PathVariable("departmentId") long departmentId,
                                                                                     @PathVariable("courseId") long courseId) {
+        courseOfferingsDTO.clear();
         System.out.println("Department ID is :" + departmentId);
         System.out.println("Course ID is :" + courseId);
         String departmentName = getDepartmentName(departmentId);
 
-        courseOfferingsDTO.clear();
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (ApiCourseDTO courseDTO : coursesDTO) {
@@ -183,7 +183,8 @@ public class Controller {
         if (location.equals(course.getLocation()) && semesterCode == Long.parseLong(course.getSemester().getSemesterCode())
                 && year == course.getSemester().getYear() && instructors.equals(course.getInstructorsNamesForPrinting())) {
             for (Section section : course.getSectionsList()) {
-                ApiOfferingSectionDTO apiOfferingSectionDTO = new ApiOfferingSectionDTO(section.getComponentCode(), section.getEnrolmentTotal(), section.getEnrolmentCapacity());
+                ApiOfferingSectionDTO apiOfferingSectionDTO = new ApiOfferingSectionDTO(section.getComponentCode(),
+                        section.getEnrolmentCapacity(), section.getEnrolmentTotal());
                 offeringSectionsDTO.add(apiOfferingSectionDTO);
             }
 
