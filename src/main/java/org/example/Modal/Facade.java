@@ -79,7 +79,7 @@ public class Facade {
                 : new ArrayList<>();
 
         Semester semester = new Semester(dto.semester);
-        Section section = new Section(dto.component, dto.enrollmentCap, dto.enrollmentTotal);
+        Section section = new Section(dto.component, dto.enrollmentTotal, dto.enrollmentCap);
         Course course = new Course(semester, dto.subjectName, dto.catalogNumber, dto.location, instructors, section);
 
         addCourseToListOfGroupedCoursesBelongingToSameSubject(course);

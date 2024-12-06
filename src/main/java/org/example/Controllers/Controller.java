@@ -191,7 +191,7 @@ public class Controller {
                 && year == course.getSemester().getYear() && instructors.equals(course.getInstructorsNamesForPrinting())) {
             for (Section section : course.getSectionsList()) {
                 ApiOfferingSectionDTO apiOfferingSectionDTO = new ApiOfferingSectionDTO(section.getComponentCode(),
-                        section.getEnrolmentCapacity(), section.getEnrolmentTotal());
+                        section.getEnrolmentTotal(), section.getEnrolmentCapacity());
                 offeringSectionsDTO.add(apiOfferingSectionDTO);
             }
 
