@@ -15,7 +15,7 @@ import java.util.*;
 
 @RestController
 public class Controller {
-    private long WATCHER_ID_COUNTER = 1;
+    private final long WATCHER_ID_COUNTER = 1;
     private long DEPARTMENT_ID_COUNTER = 1;
     private long COURSE_ID_COUNTER = 1;
     Facade facade = new Facade();
@@ -258,6 +258,7 @@ public class Controller {
         for (ApiCourseDTO courseDTO : coursesDTO) {
             if (courseDTO.catalogNumber.equalsIgnoreCase(dto.catalogNumber)) {
                 isCourseAlreadyExist = true;
+                break;
             }
         }
         if (!isCourseAlreadyExist) {
