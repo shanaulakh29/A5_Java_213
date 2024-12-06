@@ -53,7 +53,6 @@ public class Controller {
 
     @GetMapping("/api/departments")
     public ResponseEntity<List<ApiDepartmentDTO>> getDepartments() {
-        System.out.println("Entered getDepartments");
 
         coursesDTO.clear();
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
@@ -108,7 +107,6 @@ public class Controller {
     @GetMapping("/api/departments/{id}/courses")
     public ResponseEntity<List<ApiCourseDTO>> getCoursesFromSpecificDepartment(@PathVariable long id) {
         coursesDTO.clear();
-        System.out.println("Department ID is :" + id);
 
         String departmentName = getDepartmentName(id);
 
@@ -291,8 +289,6 @@ public class Controller {
         long endSemesterForGraph = getEndSemester(departmentName);
         START_SEMESTER_MODIFIABLE = startSemesterForGraph;
 
-        System.out.println("StartSemesterForGraph: " + startSemesterForGraph);
-        System.out.println("EndSemesterForGraph: " + endSemesterForGraph);
         while (startSemesterForGraph <= endSemesterForGraph) {
             long totalStudentsEnrolledPerSemester = 0;
             totalStudentsEnrolledPerSemester = getTotalStudentsEnrolledPerSemester(departmentName,
@@ -302,7 +298,6 @@ public class Controller {
             graphDataPointsDTO.add(apiGraphDataPointDTO);
             addIntoModifiableStartValue();
             startSemesterForGraph = START_SEMESTER_MODIFIABLE;
-            System.out.println("StartSemesterIncremented " + startSemesterForGraph);
         }
 
         return new ResponseEntity<>(graphDataPointsDTO, HttpStatus.OK);
@@ -380,7 +375,6 @@ public class Controller {
 
     @GetMapping("api/watchers")
     public ResponseEntity<List<ApiWatcherDTO>> getWatchers() {
-        System.out.println("Entered Get api/watchers");
         return new ResponseEntity<>(watchersDTO, HttpStatus.OK);
 
     }
@@ -401,12 +395,10 @@ public class Controller {
         long courseId = apiWatcherCreateDTO.courseId;
         String departmentName = getDepartmentName(deptId);
         if (departmentName == null) {
-            System.out.println("Department name is null");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         String courseCatalogNumber = getCourseCatalogNumber(departmentName, courseId);
         if (courseCatalogNumber == null) {
-            System.out.println("Course catalog number is null");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -443,7 +435,6 @@ public class Controller {
 
         });
         watchersDTO.add(apiWatcherDTO);
-        System.out.println("apiWatcherDTO length is" + watchersDTO.size());
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
