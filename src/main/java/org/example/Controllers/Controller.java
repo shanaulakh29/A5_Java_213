@@ -55,7 +55,7 @@ public class Controller {
     public ResponseEntity<List<ApiDepartmentDTO>> getDepartments() {
         System.out.println("Entered getDepartments");
 
-
+        coursesDTO.clear();
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             String departmentName = courses.get(0).getSubjectName().toUpperCase();
             if (departmentsDTO.isEmpty()) {
@@ -110,7 +110,6 @@ public class Controller {
 
     @GetMapping("/api/departments/{id}/courses")
     public ResponseEntity<List<ApiCourseDTO>> getCoursesFromSpecificDepartment(@PathVariable long id) {
-//        coursesDTO.clear();
         System.out.println("Department ID is :" + id);
 
         String departmentName = getDepartmentName(id);
@@ -121,14 +120,11 @@ public class Controller {
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (Course course : courses) {
-
                     if (!containsCourse(coursesDTO, course.getSubjectCatalogNumber())) {
-                        ApiCourseDTO courseDTO = new ApiCourseDTO(COURSE_ID_COUNTER, course.getSubjectCatalogNumber());
+                        ApiCourseDTO courseDTO = new ApiCourseDTO(COURSE_ID_COUNTER++, course.getSubjectCatalogNumber());
                         coursesDTO.add(courseDTO);
-                        COURSE_ID_COUNTER++;
                     }
                 }
-                System.out.println("-----------------------------------------------------");
             }
         }
 
@@ -304,6 +300,9 @@ public class Controller {
 
         String departmentName = getDepartmentName(id);
 //        facade.setStartSemesterToOriginalStartSemester();
+        if (departmentName == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
         long startSemesterForGraph = getStartSemester(departmentName);
         long endSemesterForGraph = getEndSemester(departmentName);
@@ -356,6 +355,7 @@ public class Controller {
         for (ApiCourseDTO courseDTO : coursesDTO) {
             if (courseDTO.catalogNumber.equals(dto.catalogNumber)) {
                 isCourseCatalogNumberAlreadyExist = true;
+                break;
             }
         }
         if (!isCourseCatalogNumberAlreadyExist) {
