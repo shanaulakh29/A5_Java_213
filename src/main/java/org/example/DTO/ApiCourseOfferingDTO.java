@@ -1,6 +1,6 @@
 package org.example.DTO;
 
-public class ApiCourseOfferingDTO {
+public class ApiCourseOfferingDTO implements Comparable<ApiCourseOfferingDTO> {
     public long courseOfferingId;
     public String location;
     public String instructors;
@@ -14,5 +14,10 @@ public class ApiCourseOfferingDTO {
         this.term = term;
         this.semesterCode = semesterCode;
         this.year = year;
+    }
+
+    @Override
+    public int compareTo(ApiCourseOfferingDTO o) {
+        return  Long.compare(this.courseOfferingId, o.courseOfferingId);
     }
 }

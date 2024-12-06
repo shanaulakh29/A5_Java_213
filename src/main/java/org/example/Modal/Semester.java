@@ -1,7 +1,7 @@
 package org.example.Modal;
 
 public class Semester {
-    private final String semesterCode;
+    private String semesterCode;
     private int year;
     private String term;
 
@@ -45,4 +45,26 @@ public class Semester {
         Semester semester = (Semester) o;
         return this.semesterCode.equals(semester.semesterCode);
     }
+
 }
+
+
+//    public long getStartSemesterForDepartmentDataFromCSV() {
+//        return startSemesterForDepartmentDataFromCSV;
+//    }
+//    public long getEndSemesterForDepartmentDataFromCSV() {
+//        return endSemesterForDepartmentDataFromCSV;
+//    }
+//    public void setStartSemesterForDepartmentDataFromCSV(long semesterCode) {
+//        this.startSemesterForDepartmentDataFromCSV = semesterCode;
+//    }
+//    public void setEndSemesterForDepartmentDataFromCSV(long semesterCode) {
+//        this.endSemesterForDepartmentDataFromCSV = semesterCode;
+//    }
+//    private long startSemesterForDepartmentDataFromCSV;
+//    private long endSemesterForDepartmentDataFromCSV;
+//
+//    public Semester(){
+//        this.startSemesterForDepartmentDataFromCSV=0;
+//        this.endSemesterForDepartmentDataFromCSV=0;
+//    }

@@ -11,9 +11,6 @@ public class Facade {
     private ExtractDataFromFile extractDataFromFile = new ExtractDataFromFile();
     private List<CourseSectionChangeObserver> observers=new ArrayList<>();
 
-    //Observer Code
-
-
 
     public void addObserver(CourseSectionChangeObserver observer){
         observers.add(observer);
@@ -44,10 +41,10 @@ public class Facade {
     }
 
     public void addCourseToListOfGroupedCoursesBelongingToSameSubject(Course course) {
-        List<List<Course>> listOfGroupedCoursesBasedOnSubject = getListOfGroupedCoursesBasedOnSubject();
+        ;
 
         boolean isSubjectFound = false;
-        for (List<Course> courses : listOfGroupedCoursesBasedOnSubject) {
+        for (List<Course> courses : getListOfGroupedCoursesBasedOnSubject()) {
             if (courses.get(0).isSameSubject(course)) {
                 courses.add(course);
                 isSubjectFound = true;
@@ -58,7 +55,7 @@ public class Facade {
         if (!isSubjectFound) {
             List<Course> courses= new ArrayList<>();
             courses.add(course);
-            listOfGroupedCoursesBasedOnSubject.add(courses);
+            getListOfGroupedCoursesBasedOnSubject().add(courses);
 
         }
     }
@@ -86,3 +83,19 @@ public class Facade {
 
 
 }
+
+//public long getStartSemesterForDepartmentDataFromCSV(){
+//    return extractDataFromFile.getStartSemesterForDepartmentDataFromCSV();
+//}
+//public long getEndSemesterForDepartmentDataFromCSV(){
+//    return extractDataFromFile.getEndSemesterForDepartmentDataFromCSV();
+//}
+//public void addIntoStartSemester(){
+//    extractDataFromFile.addIntoStartSemester();
+//}
+//public long getOriginalStartSemester(){
+//    return extractDataFromFile.getOriginalStartSemester();
+//}
+//public void setStartSemesterToOriginalStartSemester(){
+//    extractDataFromFile.setStartSemesterToOriginalStartSemester();
+//}

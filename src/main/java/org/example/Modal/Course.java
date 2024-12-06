@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Course {
+public class Course  {
     private Semester semester;
     private String subjectName;
     private final String subjectCatalogNumber;

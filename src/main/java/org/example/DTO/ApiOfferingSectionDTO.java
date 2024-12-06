@@ -9,4 +9,7 @@ public class ApiOfferingSectionDTO {
         this.enrollmentCap = enrollmentCap;
         this.enrollmentTotal = enrollmentTotal;
     }
+    public void addIntoEnrollmentTotal(int enrollmentTotal) {
+        this.enrollmentTotal += enrollmentTotal;
+    }
 }
