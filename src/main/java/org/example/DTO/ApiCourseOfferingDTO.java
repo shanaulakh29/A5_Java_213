@@ -7,6 +7,7 @@ public class ApiCourseOfferingDTO implements Comparable<ApiCourseOfferingDTO> {
     public String term;
     public long semesterCode;
     public int year;
+
     public ApiCourseOfferingDTO(long courseOfferingId, String location, String instructors, String term, long semesterCode, int year) {
         this.courseOfferingId = courseOfferingId;
         this.location = location;
@@ -18,6 +19,6 @@ public class ApiCourseOfferingDTO implements Comparable<ApiCourseOfferingDTO> {
 
     @Override
     public int compareTo(ApiCourseOfferingDTO o) {
-        return  Long.compare(this.courseOfferingId, o.courseOfferingId);
+        return Long.compare(this.courseOfferingId, o.courseOfferingId);
     }
 }

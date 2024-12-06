@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Course  {
+public class Course {
     private Semester semester;
     private String subjectName;
     private final String subjectCatalogNumber;
-    private  String location;
+    private String location;
     private List<String> instructors = new ArrayList<>();
     private List<Section> sections = new ArrayList<>();
     private Section section;
-//    private List<courseSectionChangeObserver> observers=new ArrayList<>();
 
     public Course(Semester semester, String subjectName, String subjectCatalogNumber,
                   String location, List<String> instructors, Section section) {
@@ -24,42 +23,41 @@ public class Course  {
         this.section = section;
         this.addNewSectionOrAddIntoAlreadyExistingSection(this.section);
     }
-//    //Observer Code
-//    interface courseSectionChangeObserver{
-//        void newSectionBeingAdded();
-//    }
-//
-//    public void addObserver(courseSectionChangeObserver observer){
-//        observers.add(observer);
-//    }
 
 
     public Semester getSemester() {
         return semester;
     }
+
     public String getSubjectName() {
         return subjectName;
     }
+
     public String getSubjectCatalogNumber() {
         return subjectCatalogNumber;
     }
-    public String getLocation(){
+
+    public String getLocation() {
         return location;
     }
-    public String getInstructorsNamesForPrinting(){
-        StringBuilder names= new StringBuilder();
-        for(String instructor:instructors){
+
+    public String getInstructorsNamesForPrinting() {
+        StringBuilder names = new StringBuilder();
+        for (String instructor : instructors) {
             names.append(instructor).append(", ");
         }
-        return names.substring(0, names.length()-2);
+        return names.substring(0, names.length() - 2);
 
     }
+
     public List<String> getInstructors() {
         return instructors;
     }
+
     public Section getSection() {
         return section;
     }
+
     public List<Section> getSectionsList() {
         return sections;
     }
@@ -67,27 +65,31 @@ public class Course  {
     public void addNewSectionOrAddIntoAlreadyExistingSection(Section section) {
         for (Section currentSection : this.sections) {
             if (currentSection.getComponentCode().equals(section.getComponentCode())) {
-                currentSection.addEnrolment(section.getEnrolmentCapacity(),section.getEnrolmentTotal());
+                currentSection.addEnrolment(section.getEnrolmentCapacity(), section.getEnrolmentTotal());
                 return;
             }
         }
         this.sections.add(section);
     }
-    public void addInstructorToGroup(Course course){
 
-    for(String instructor:course.getInstructors()){
-        if(!(this.getInstructors().contains(instructor))){
-            this.getInstructors().add(instructor);
+    public void addInstructorToGroup(Course course) {
+
+        for (String instructor : course.getInstructors()) {
+            if (!(this.getInstructors().contains(instructor))) {
+                this.getInstructors().add(instructor);
+            }
         }
     }
+
+    public boolean isSameSubject(Course course) {
+        return (this.subjectName.equals(course.getSubjectName()) &&
+                this.subjectCatalogNumber.equals(course.getSubjectCatalogNumber()));
     }
-       public boolean isSameSubject(Course course){
-        return (this.subjectName.equals(course.getSubjectName())&&this.subjectCatalogNumber.equals(course.getSubjectCatalogNumber()));
-       }
-        public boolean isSameCourse(Course course) {
-        if(this.subjectName.equals(course.subjectName)&& this.subjectCatalogNumber.equals(course.subjectCatalogNumber)&&
-        this.getLocation().equals(course.getLocation())&&
-        this.semester.equals(course.semester)) {
+
+    public boolean isSameCourse(Course course) {
+        if (this.subjectName.equals(course.subjectName) && this.subjectCatalogNumber.equals(course.subjectCatalogNumber)
+                && this.getLocation().equals(course.getLocation()) &&
+                this.semester.equals(course.semester)) {
             return true;
         }
         return false;
@@ -95,22 +97,3 @@ public class Course  {
 
 }
 
-
-//    private List<CourseOffering> courseOfferings = new ArrayList<>();
-//    public CourseOffering findOrCreateCourseOffering(Semester semester, String location) {
-//        for (CourseOffering offering : courseOfferings) {
-//            if (offering.getSemester().equals(semester) && offering.getLocation().equals(location)) {
-//                return offering;
-//            }
-//        }
-//        CourseOffering newOffering = new CourseOffering(semester, location);
-//        courseOfferings.add(newOffering);
-//        return newOffering;
-//    }
-//    public List<CourseOffering> getOfferings() {
-//        return courseOfferings;
-//    }
-//    public String getSemesterCode() {
-//        return semester.getSemesterCode();
-//    }
-//        addNewSection(section.getComponentCode(),section.getEnrolmentCapacity(),section.getEnrolmentTotal());
