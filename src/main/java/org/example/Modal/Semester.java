@@ -8,8 +8,8 @@ public class Semester {
     public Semester(String semesterCode) {
         this.semesterCode = semesterCode;
         int semesterNum = Integer.parseInt(semesterCode);
-        int yearToBeCalculated= semesterNum / 10;
-        this.year= calculateYear(yearToBeCalculated);
+        int yearToBeCalculated = semesterNum / 10;
+        this.year = calculateYear(yearToBeCalculated);
 
         int termNum = semesterNum % 10;
 
@@ -19,13 +19,14 @@ public class Semester {
             case 7 -> this.term = "Fall";
         }
     }
+
     public int calculateYear(int yearToBeCalculated) {
-        int z=yearToBeCalculated%10;
-        yearToBeCalculated=yearToBeCalculated/10;
-        int y=yearToBeCalculated%10;
-        yearToBeCalculated=yearToBeCalculated/10;
-        int x=yearToBeCalculated%10;
-        return 1900+100*x+10*y+z;
+        int z = yearToBeCalculated % 10;
+        yearToBeCalculated = yearToBeCalculated / 10;
+        int y = yearToBeCalculated % 10;
+        yearToBeCalculated = yearToBeCalculated / 10;
+        int x = yearToBeCalculated % 10;
+        return 1900 + 100 * x + 10 * y + z;
     }
 
     public String getSemesterCode() {
@@ -48,23 +49,3 @@ public class Semester {
 
 }
 
-
-//    public long getStartSemesterForDepartmentDataFromCSV() {
-//        return startSemesterForDepartmentDataFromCSV;
-//    }
-//    public long getEndSemesterForDepartmentDataFromCSV() {
-//        return endSemesterForDepartmentDataFromCSV;
-//    }
-//    public void setStartSemesterForDepartmentDataFromCSV(long semesterCode) {
-//        this.startSemesterForDepartmentDataFromCSV = semesterCode;
-//    }
-//    public void setEndSemesterForDepartmentDataFromCSV(long semesterCode) {
-//        this.endSemesterForDepartmentDataFromCSV = semesterCode;
-//    }
-//    private long startSemesterForDepartmentDataFromCSV;
-//    private long endSemesterForDepartmentDataFromCSV;
-//
-//    public Semester(){
-//        this.startSemesterForDepartmentDataFromCSV=0;
-//        this.endSemesterForDepartmentDataFromCSV=0;
-//    }

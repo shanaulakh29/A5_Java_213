@@ -8,15 +8,6 @@ import java.util.List;
 public class Facade {
     private ExtractDataFromFile extractDataFromFile = new ExtractDataFromFile();
     private List<CourseSectionChangeObserver> observers = new ArrayList<>();
-    private List<ApiCourseDTO> courseDTOs = new ArrayList<>();
-    private List<ApiDepartmentDTO> departmentDTOs = new ArrayList<>();
-    private List<ApiCourseOfferingDTO> courseOfferingDTOs = new ArrayList<>();
-    private long courseId;
-    private long departmentId;
-    private long courseOfferingId;
-
-
-    //Observer Code
 
 
     public void addObserver(CourseSectionChangeObserver observer) {
@@ -88,18 +79,3 @@ public class Facade {
 
 }
 
-//public long getStartSemesterForDepartmentDataFromCSV(){
-//    return extractDataFromFile.getStartSemesterForDepartmentDataFromCSV();
-//}
-//public long getEndSemesterForDepartmentDataFromCSV(){
-//    return extractDataFromFile.getEndSemesterForDepartmentDataFromCSV();
-//}
-//public void addIntoStartSemester(){
-//    extractDataFromFile.addIntoStartSemester();
-//}
-//public long getOriginalStartSemester(){
-//    return extractDataFromFile.getOriginalStartSemester();
-//}
-//public void setStartSemesterToOriginalStartSemester(){
-//    extractDataFromFile.setStartSemesterToOriginalStartSemester();
-//}

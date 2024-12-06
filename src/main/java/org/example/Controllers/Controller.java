@@ -97,19 +97,17 @@ public class Controller {
         return null;
     }
 
-//    private void addAllCoursesBasedOnDepartmentInCoursesDTOList(List<Course> courses) {
-//        long courseIdCounter = 1;
-//        for (Course course : courses) {
-//            if (!containsCourse(coursesDTO, course.getSubjectCatalogNumber())) {
-//                ApiCourseDTO courseDTO = new ApiCourseDTO(courseIdCounter, course.getSubjectCatalogNumber());
-//                coursesDTO.add(courseDTO);
-//                courseIdCounter++;
-//            }
-//        }
-//    }
+    private void fillCourseDTOListForSelectedDepartment(Course course) {
+        if (!containsCourse(coursesDTO, course.getSubjectCatalogNumber())) {
+            ApiCourseDTO courseDTO = new ApiCourseDTO(COURSE_ID_COUNTER, course.getSubjectCatalogNumber());
+            coursesDTO.add(courseDTO);
+            COURSE_ID_COUNTER++;
+        }
+    }
 
     @GetMapping("/api/departments/{id}/courses")
     public ResponseEntity<List<ApiCourseDTO>> getCoursesFromSpecificDepartment(@PathVariable long id) {
+        coursesDTO.clear();
         System.out.println("Department ID is :" + id);
 
         String departmentName = getDepartmentName(id);
@@ -120,10 +118,7 @@ public class Controller {
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (Course course : courses) {
-                    if (!containsCourse(coursesDTO, course.getSubjectCatalogNumber())) {
-                        ApiCourseDTO courseDTO = new ApiCourseDTO(COURSE_ID_COUNTER++, course.getSubjectCatalogNumber());
-                        coursesDTO.add(courseDTO);
-                    }
+                    fillCourseDTOListForSelectedDepartment(course);
                 }
             }
         }
@@ -157,9 +152,8 @@ public class Controller {
     ResponseEntity<List<ApiCourseOfferingDTO>> getCourseOfferingsOfParticularCourse(
             @PathVariable("departmentId") long departmentId,
             @PathVariable("courseId") long courseId) {
+
         courseOfferingsDTO.clear();
-        System.out.println("Department ID is :" + departmentId);
-        System.out.println("Course ID is :" + courseId);
         String departmentName = getDepartmentName(departmentId);
 
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
@@ -183,8 +177,10 @@ public class Controller {
         long semesterCode = apiCourseOfferingDTO.semesterCode;
         long year = apiCourseOfferingDTO.year;
         String instructors = apiCourseOfferingDTO.instructors;
-        if (location.equals(course.getLocation()) && semesterCode == Long.parseLong(course.getSemester().getSemesterCode())
-                && year == course.getSemester().getYear() && instructors.equals(course.getInstructorsNamesForPrinting())) {
+        if (location.equals(course.getLocation()) && semesterCode ==
+                Long.parseLong(course.getSemester().getSemesterCode())
+                && year == course.getSemester().getYear()
+                && instructors.equals(course.getInstructorsNamesForPrinting())) {
             for (Section section : course.getSectionsList()) {
                 ApiOfferingSectionDTO apiOfferingSectionDTO = new ApiOfferingSectionDTO(section.getComponentCode(),
                         section.getEnrolmentTotal(), section.getEnrolmentCapacity());
@@ -195,7 +191,8 @@ public class Controller {
         }
     }
 
-    private void isCourseOfferingIdMatchesProvidedOfferingIdThenAddSectionsIntoSectionDTOList(Course course, long offeringId) {
+    private void isCourseOfferingIdMatchesProvidedOfferingIdThenAddSectionsIntoSectionDTOList(Course course,
+                                                                                              long offeringId) {
         for (ApiCourseOfferingDTO apiCourseOfferingDTO : courseOfferingsDTO) {
             if (apiCourseOfferingDTO.courseOfferingId == offeringId) {
                 addIntoSectionsDTOListIfCourseInfoMatches(apiCourseOfferingDTO, course);
@@ -203,12 +200,12 @@ public class Controller {
         }
     }
 
-    private void addCourseSectionsToOfferingSectionDTO(ApiCourseDTO courseDTO, Long courseId, List<Course> courses, long offeringId) {
+    private void addCourseSectionsToOfferingSectionDTO(ApiCourseDTO courseDTO, Long courseId, List<Course> courses,
+                                                       long offeringId) {
         if (courseDTO.courseId == courseId) {
             String subjectCatalogNumber = courseDTO.catalogNumber;
-//        long offeringIdCounter = 1;
             for (Course course : courses) {
-                if (course.getSubjectCatalogNumber().equals(subjectCatalogNumber)) {//get courses offered in particular catalog number
+                if (course.getSubjectCatalogNumber().equals(subjectCatalogNumber)) {
                     isCourseOfferingIdMatchesProvidedOfferingIdThenAddSectionsIntoSectionDTOList(course, offeringId);
 
                 }
@@ -244,20 +241,11 @@ public class Controller {
 
 
     private long getStartSemester(String departmentName) {
-        boolean isFirstLoop = true;
-        long startSemester = 0;
+        long startSemester = Long.MAX_VALUE;
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (Course course : courses) {
-                    if (isFirstLoop) {
-                        startSemester = Long.parseLong(course.getSemester().getSemesterCode());
-                        isFirstLoop = false;
-                    }
-                    if (!isFirstLoop) {
-                        if (startSemester > Long.parseLong(course.getSemester().getSemesterCode())) {
-                            startSemester = Long.parseLong(course.getSemester().getSemesterCode());
-                        }
-                    }
+                    startSemester = Math.min(startSemester, Long.parseLong(course.getSemester().getSemesterCode()));
                 }
             }
         }
@@ -265,20 +253,13 @@ public class Controller {
     }
 
     private long getEndSemester(String departmentName) {
-        boolean isFirstLoop = true;
-        long endSemester = 0;
+
+        long endSemester = Long.MIN_VALUE;
         for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
             if (isSameDepartmentName(courses.get(0), departmentName)) {
                 for (Course course : courses) {
-                    if (isFirstLoop) {
-                        endSemester = Long.parseLong(course.getSemester().getSemesterCode());
-                        isFirstLoop = false;
-                    }
-                    if (!isFirstLoop) {
-                        if (endSemester < Long.parseLong(course.getSemester().getSemesterCode())) {
-                            endSemester = Long.parseLong(course.getSemester().getSemesterCode());
-                        }
-                    }
+                    endSemester = Math.max(endSemester, Long.parseLong(course.getSemester().getSemesterCode()));
+
                 }
             }
         }
@@ -294,8 +275,10 @@ public class Controller {
         }
     }
 
+
     @GetMapping("/api/stats/students-per-semester")
-    public ResponseEntity<List<ApiGraphDataPointDTO>> getTotalStudentsEnrolledPerSemester(@RequestParam("deptId") long id) {
+    public ResponseEntity<List<ApiGraphDataPointDTO>> getTotalStudentsEnrolledPerSemester(
+            @RequestParam("deptId") long id) {
         List<ApiGraphDataPointDTO> graphDataPointsDTO = new ArrayList<>();
 
         String departmentName = getDepartmentName(id);
@@ -312,15 +295,8 @@ public class Controller {
         System.out.println("EndSemesterForGraph: " + endSemesterForGraph);
         while (startSemesterForGraph <= endSemesterForGraph) {
             long totalStudentsEnrolledPerSemester = 0;
-            for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
-                if (isSameDepartmentName(courses.get(0), departmentName)) {
-                    for (Course course : courses) {
-                        if (Long.parseLong(course.getSemester().getSemesterCode()) == startSemesterForGraph) {
-                            totalStudentsEnrolledPerSemester += course.getSection().getEnrolmentTotal();
-                        }
-                    }
-                }
-            }
+            totalStudentsEnrolledPerSemester = getTotalStudentsEnrolledPerSemester(departmentName,
+                    startSemesterForGraph, totalStudentsEnrolledPerSemester);
             ApiGraphDataPointDTO apiGraphDataPointDTO = new ApiGraphDataPointDTO(startSemesterForGraph,
                     totalStudentsEnrolledPerSemester);
             graphDataPointsDTO.add(apiGraphDataPointDTO);
@@ -330,6 +306,33 @@ public class Controller {
         }
 
         return new ResponseEntity<>(graphDataPointsDTO, HttpStatus.OK);
+    }
+
+    private long getTotalStudentsEnrolledPerSemester(String departmentName, long startSemesterForGraph,
+                                                     long totalStudentsEnrolledPerSemester) {
+        for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
+            if (isSameDepartmentName(courses.get(0), departmentName)) {
+                for (Course course : courses) {
+                    totalStudentsEnrolledPerSemester = getTotalStudentsEnrolledPerSemester(startSemesterForGraph,
+                            totalStudentsEnrolledPerSemester, course);
+                }
+
+            }
+        }
+        return totalStudentsEnrolledPerSemester;
+    }
+
+    private static long getTotalStudentsEnrolledPerSemester(long startSemesterForGraph,
+                                                            long totalStudentsEnrolledPerSemester, Course course) {
+        if (Long.parseLong(course.getSemester().getSemesterCode()) == startSemesterForGraph) {
+            for (Section section : course.getSectionsList()) {
+                if (section.getComponentCode().equals("LEC")) {
+                    totalStudentsEnrolledPerSemester += section.getEnrolmentTotal();
+                }
+            }
+
+        }
+        return totalStudentsEnrolledPerSemester;
     }
 
 
@@ -424,11 +427,14 @@ public class Controller {
                 String watcherCatalogNumber = apiWatcherDTO.course.catalogNumber;
                 String watcherDepartmentName = apiWatcherDTO.department.name;
 
-                if (watcherCatalogNumber.equals(course.getSubjectCatalogNumber()) && watcherDepartmentName.equals(course.getSubjectName())) {
+                if (watcherCatalogNumber.equals(course.getSubjectCatalogNumber()) &&
+                        watcherDepartmentName.equals(course.getSubjectName())) {
                     ZonedDateTime zonedDateTime = ZonedDateTime.now();
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss z yyyy");
                     String formattedDate = zonedDateTime.format(dateTimeFormatter);
-                    apiWatcherDTO.events.add(formattedDate + " Added section " + course.getSection().getComponentCode() + " with enrollment (" + course.getSection().getEnrolmentTotal() + "/" + course.getSection().getEnrolmentCapacity() + ")" +
+                    apiWatcherDTO.events.add(formattedDate + " Added section " + course.getSection().getComponentCode()
+                            + " with enrollment (" + course.getSection().getEnrolmentTotal() + "/"
+                            + course.getSection().getEnrolmentCapacity() + ")" +
                             " to offering " + course.getSemester().getTerm() + " " + course.getSemester().getYear());
 
                 }
@@ -472,172 +478,3 @@ public class Controller {
 
 }
 
-//@GetMapping("/api/departments/{departmentId}/courses/{courseId}/offerings")
-//ResponseEntity<List<ApiCourseOfferingDTO>> getCourseOfferingsOfParticularCourse(@PathVariable("departmentId") long departmentId,
-//                                                                                @PathVariable("courseId") long courseId) {
-//        for (ApiDepartmentDTO departmentDTO : departmentsDTO) {
-//            if (departmentDTO.getDeptId() == id) {
-//                String departmentDTOName = departmentDTO.getName();
-//                for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
-//                    if (courses.get(0).getSubjectName().toUpperCase().equals(departmentDTOName)) {
-//                        for (Course course : courses) {
-//                            if (!containsCourse(coursesDTO, course.getSubjectCatalogNumber())) {
-//                                ApiCourseDTO courseDTO = new ApiCourseDTO(courseIdCounter, course.getSubjectCatalogNumber());
-//                                coursesDTO.add(courseDTO);
-//                                courseIdCounter++;
-//                            }
-//
-//                        }
-//                        System.out.println("-----------------------------------------------------");
-//                    }
-//                }
-//                System.out.println("----");
-//            }
-//        }
-
-//@GetMapping("/api/departments/{departmentId}/courses/{courseId}/offerings")
-//ResponseEntity<List<ApiCourseOfferingDTO>> getCourseOfferingsOfParticularCourse(@PathVariable("departmentId") long departmentId,
-//                                                                                @PathVariable("courseId") long courseId) {
-//        for (ApiDepartmentDTO departmentDTO : departmentsDTO) {
-//            if (departmentDTO.getDeptId() == departmentId) {
-//                String departmentDTOName = departmentDTO.getName();
-//                for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
-//                    if (courses.get(0).getSubjectName().toUpperCase().equals(departmentDTOName)) {//get Specific list that contains only courses belonging to that department
-//                        for (ApiCourseDTO courseDTO : coursesDTO) {
-//                            if (courseDTO.courseId == courseId) {
-//                                String subjectCatalogNumber = courseDTO.catalogNumber;
-//                                long offeringIdCounter = 1;
-//                                for (Course course : courses) {
-//                                    if (course.getSubjectCatalogNumber().equals(subjectCatalogNumber)) {//get courses offered in particular catalog number
-//                                        ApiCourseOfferingDTO apiCourseOfferingDTO = new ApiCourseOfferingDTO(offeringIdCounter,
-//                                                course.getLocation(), course.getInstructorsNamesForPrinting(), course.getSemester().getTerm(),
-//                                                Long.parseLong(course.getSemester().getSemesterCode()), course.getSemester().getYear());
-//                                        courseOfferingsDTO.add(apiCourseOfferingDTO);
-//                                        offeringIdCounter++;
-//                                    }
-//                                }
-//
-//                            }
-//                        }
-//                    }
-//                }
-//
-//            }
-//        }
-
-
-//@GetMapping("/api/departments/{departmentId}/courses/{courseId}/offerings/{offeringId}")
-//ResponseEntity<List<ApiOfferingSectionDTO>> getListOfSectionsOfParticularCourseOffering(
-//        for (ApiDepartmentDTO departmentDTO : departmentsDTO) {
-//            if (departmentDTO.getDeptId() == departmentId) {
-//                String departmentDTOName = departmentDTO.getName();
-//                for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
-//                    if (courses.get(0).getSubjectName().toUpperCase().equals(departmentDTOName)) {//get Specific list that contains only courses belonging to that department
-//                        for (ApiCourseDTO courseDTO : coursesDTO) {
-//                            if (courseDTO.courseId == courseId) {
-//                                String subjectCatalogNumber = courseDTO.catalogNumber;
-//                                long offeringIdCounter = 1;
-//                                for (Course course : courses) {
-//                                    if (course.getSubjectCatalogNumber().equals(subjectCatalogNumber)) {//get courses offered in particular catalog number
-//                                        for (ApiCourseOfferingDTO apiCourseOfferingDTO : courseOfferingsDTO) {
-//                                            if (apiCourseOfferingDTO.courseOfferingId == offeringId) {
-//                                                String location = apiCourseOfferingDTO.location;
-//                                                String term = apiCourseOfferingDTO.term;
-//                                                long semesterCode = apiCourseOfferingDTO.semesterCode;
-//                                                long year = apiCourseOfferingDTO.year;
-//                                                String instructors = apiCourseOfferingDTO.instructors;
-//                                                if (location.equals(course.getLocation()) && semesterCode == Long.parseLong(course.getSemester().getSemesterCode())
-//                                                        && year == course.getSemester().getYear() && instructors.equals(course.getInstructorsNamesForPrinting())) {
-//                                                    for (Section section : course.getSectionsList()) {
-//                                                        ApiOfferingSectionDTO apiOfferingSectionDTO = new ApiOfferingSectionDTO(section.getComponentCode(), section.getEnrolmentTotal(), section.getEnrolmentCapacity());
-//                                                        offeringSectionsDTO.add(apiOfferingSectionDTO);
-//                                                    }
-//
-//
-//                                                }
-//
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-
-//=======
-//        boolean isDepartmentAlreadyExist = false;
-//        for (ApiDepartmentDTO departmentDTO : departmentsDTO) {
-//            if (departmentDTO.name.equals(dto.subjectName)) {
-//                isDepartmentAlreadyExist = true;
-//                break;
-//            }
-//        }
-//        if (!isDepartmentAlreadyExist) {
-//            ApiDepartmentDTO newDepartmentDTO = new ApiDepartmentDTO(DEPARTMENT_ID_COUNTER, dto.subjectName);
-//            departmentsDTO.add(newDepartmentDTO);
-//            DEPARTMENT_ID_COUNTER++;
-//        }
-//        boolean isCourseAlreadyExist = false;
-//        for (ApiCourseDTO courseDTO : coursesDTO) {
-//            if (courseDTO.catalogNumber.equalsIgnoreCase(dto.catalogNumber)) {
-//                isCourseAlreadyExist = true;
-//                break;
-//            }
-//        }
-//        if (!isCourseAlreadyExist) {
-//            ApiCourseDTO newCourseDTO = new ApiCourseDTO(COURSE_ID_COUNTER, dto.catalogNumber);
-//            coursesDTO.add(newCourseDTO);
-//            COURSE_ID_COUNTER++;
-//        }
-//
-//>>>>>>> redesign
-
-
-//    @GetMapping("/api/stats/students-per-semester")
-//    public ResponseEntity<List<ApiGraphDataPointDTO>> getTotalStudentsEnrolledPerSemester(@RequestParam("deptId") long id) {
-//        List<ApiGraphDataPointDTO> graphDataPointsDTO = new ArrayList<>();
-//        String departmentName = getDepartmentName(id);
-//        facade.setStartSemesterToOriginalStartSemester();
-//      long startSemesterForGraph= facade.getOriginalStartSemester();
-//      long endSemesterForGraph = facade.getEndSemesterForDepartmentDataFromCSV();
-//
-//        System.out.println("StartSemesterForGraph: " + startSemesterForGraph);
-//        System.out.println("EndSemesterForGraph: " + endSemesterForGraph);
-//      while(startSemesterForGraph<=endSemesterForGraph) {
-//          long totalStudentsEnrolledPerSemester=0;
-//          for(List<Course> courses : AllGroupedCoursesBelongingToSameSubject){
-//              if(isSameDepartmentName(courses.get(0), departmentName)) {
-//                  for(Course course : courses) {
-//                   if(Long.parseLong(course.getSemester().getSemesterCode())==startSemesterForGraph) {
-//                       totalStudentsEnrolledPerSemester+=course.getSection().getEnrolmentTotal();
-//                   }
-//                  }
-//              }
-//          }
-//          ApiGraphDataPointDTO apiGraphDataPointDTO=new ApiGraphDataPointDTO(startSemesterForGraph,
-//                  totalStudentsEnrolledPerSemester);
-//          graphDataPointsDTO.add(apiGraphDataPointDTO);
-//     facade.addIntoStartSemester();
-//     startSemesterForGraph = facade.getStartSemesterForDepartmentDataFromCSV();
-//          System.out.println("StartSemesterIncremented " + startSemesterForGraph);
-//      }
-//
-//        return new ResponseEntity<>(graphDataPointsDTO, HttpStatus.OK);
-//    }
-
-//        for (List<Course> courses : AllGroupedCoursesBelongingToSameSubject) {
-//            if (isSameDepartmentName(courses.get(0), departmentName)) {
-//               for(ApiCourseOfferingDTO apiCourseOfferingDTO : courseOfferingsDTO) {
-//                   for(Course course: courses) {
-//                       if(apiCourseOfferingDTO.semesterCode==Long.parseLong(course.getSemester().getSemesterCode())){
-//
-//                       }
-//                   }
-//
-//               }
-//            }
-//            }

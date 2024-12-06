@@ -10,6 +10,7 @@ public class ExtractDataFromFile {
     private static List<Course> courses = new ArrayList<>();//remove it
     private static List<Course> ListOfGroupedCourses = new ArrayList<>();
     private static List<List<Course>> ListOfGroupedCoursesBasedOnSubject = new ArrayList<>();
+    private final String FILE_PATH = "./data/course_data_2018.csv";
 
     public List<List<Course>> getListOfGroupedCoursesBasedOnSubject() {
         return ListOfGroupedCoursesBasedOnSubject;
@@ -17,8 +18,7 @@ public class ExtractDataFromFile {
 
     public void extractDataFromFile() {
         try {
-            FileReader fileReader = new FileReader("./data/course_data_2018.csv");
-//            FileReader fileReader = new FileReader("./data/small_data.csv");
+            FileReader fileReader = new FileReader(FILE_PATH);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
             bufferedReader.readLine();
@@ -30,14 +30,11 @@ public class ExtractDataFromFile {
                 String location = data.get(3);
                 String instructorNames = data.get(6);
                 List<String> instructors = new ArrayList<>(Arrays.asList(instructorNames.split(",")));
-                ;
                 int enrollmentTotal = Integer.parseInt(data.get(4));
                 int enrollmentCapacity = Integer.parseInt(data.get(5));
                 String componentCode = data.get(7);
                 Section section = new Section(componentCode, enrollmentCapacity, enrollmentTotal);
-
                 Course course = new Course(semester, subjectName, subjectCatalogNumber, location, instructors, section);
-
                 courses.add(course);//remove it
                 groupSimilarCourses(course);
             }
@@ -78,10 +75,7 @@ public class ExtractDataFromFile {
             } else {
                 boolean isAdded = false;
                 for (List<Course> courses : ListOfGroupedCoursesBasedOnSubject) {
-                    if (courses.get(0).isSameSubject(course)) {
-                        isAdded = true;
-                        courses.add(course);
-                    }
+                    isAdded = isAdded(course, courses, isAdded);
                 }
                 if (!isAdded) {
                     List<Course> courses = new ArrayList<>();
@@ -91,6 +85,14 @@ public class ExtractDataFromFile {
             }
         }
 
+    }
+
+    private static boolean isAdded(Course course, List<Course> courses, boolean isAdded) {
+        if (courses.get(0).isSameSubject(course)) {
+            isAdded = true;
+            courses.add(course);
+        }
+        return isAdded;
     }
 
     public void printAllGroupedCoursesBelongingToSameSubject() {
@@ -103,9 +105,11 @@ public class ExtractDataFromFile {
     }
 
     public void printCourse(Course course) {
-        System.out.printf("%10s in %s by %s\n", course.getSemester().getSemesterCode(), course.getLocation(), course.getInstructorsNamesForPrinting());
+        System.out.printf("%10s in %s by %s\n", course.getSemester().getSemesterCode(), course.getLocation(),
+                course.getInstructorsNamesForPrinting());
         for (Section section : course.getSectionsList()) {
-            System.out.printf("%10s Type=%s, Enrollment=%s/%s\n", "", section.getComponentCode(), section.getEnrolmentCapacity(), section.getEnrolmentTotal());
+            System.out.printf("%10s Type=%s, Enrollment=%s/%s\n", "", section.getComponentCode(),
+                    section.getEnrolmentCapacity(), section.getEnrolmentTotal());
         }
         System.out.println();
     }
@@ -135,59 +139,3 @@ public class ExtractDataFromFile {
     }
 
 }
-
-//    public void printGroupedCourses() {
-//        for (Course course : ListOfGroupedCoursesBasedOnSimilarProfessors) {
-//            System.out.println(course.getSubjectName() + course.getSubjectCatalogNumber());
-//            System.out.printf("%10s in %s by %s\n", course.getSemester().getTerm(), course.getLocation(), course.getInstructorsNamesForPrinting());
-//            for (Section section : course.getSectionsList()) {
-//                System.out.printf("%10s Type=%s, Enrollment=%s/%s\n", "", section.getComponentCode(), section.getEnrolmentCapacity(), section.getEnrolmentTotal());
-//            }
-//        }
-//    }
-//public static void main(String[] args) {
-//        ExtractDataFromFile extractDataFromFile=new ExtractDataFromFile();
-//        extractDataFromFile.extractDataFromFile();
-//}
-//                courses.add(new CourseDetail(semester, subjectDetails, instructor, campusLocation, offerringDetails));
-//                courseGroup.groupCourses(courses.get(courses.size() - 1));
-
-//    public void setMinumumAndMaximmSemester(String semester) {
-//       long semesterCode=Integer.parseInt(semester);
-//        if(sem.getStartSemesterForDepartmentDataFromCSV()==0 &&
-//                sem.getEndSemesterForDepartmentDataFromCSV()==0) {
-//            sem.setStartSemesterForDepartmentDataFromCSV(semesterCode);
-//            sem.setEndSemesterForDepartmentDataFromCSV(semesterCode);
-//            originalStartSemester=semesterCode;
-//        }
-//        else if((sem.getStartSemesterForDepartmentDataFromCSV()> semesterCode)){
-//            originalStartSemester=semesterCode;
-//            sem.setStartSemesterForDepartmentDataFromCSV(semesterCode);
-//        }
-//        else if(sem.getEndSemesterForDepartmentDataFromCSV()< semesterCode){
-//            sem.setEndSemesterForDepartmentDataFromCSV(semesterCode);
-//        }
-//    }
-//    public long getOriginalStartSemester() {
-//       return originalStartSemester;
-//    }
-//
-//    public long getStartSemesterForDepartmentDataFromCSV(){
-//       return sem.getStartSemesterForDepartmentDataFromCSV();
-//    }
-//    public long getEndSemesterForDepartmentDataFromCSV(){
-//       return sem.getEndSemesterForDepartmentDataFromCSV();
-//    }
-//    public void setStartSemesterToOriginalStartSemester(){
-//       sem.setStartSemesterForDepartmentDataFromCSV(originalStartSemester);
-//    }
-//    public void addIntoStartSemester(){
-//       long amountToadd=0;
-//       if((getStartSemesterForDepartmentDataFromCSV()%10==1)||(getStartSemesterForDepartmentDataFromCSV()%10==4)){
-//           amountToadd=3;
-//       }
-//       else if(getStartSemesterForDepartmentDataFromCSV()%10==7){
-//           amountToadd=4;
-//       }
-//       sem.setStartSemesterForDepartmentDataFromCSV(getStartSemesterForDepartmentDataFromCSV()+amountToadd);
-//    }
